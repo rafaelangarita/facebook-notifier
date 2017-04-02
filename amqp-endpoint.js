@@ -13,7 +13,7 @@
 var amqp = require('amqplib/callback_api');
 var conf = require('./conf/amqp-endpoint.conf');
 var main = require('./main');
-var Message = require('./lib/message');
+var Message = require('scb-node-parser/message');
 
 /**
  * Receives a message from a Social Entity.

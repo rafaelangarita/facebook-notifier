@@ -3,7 +3,7 @@ const login = require('facebook-chat-api');
 const fs = require('fs');
 const sender = require('../amqp-sender');
 const scbNodeParser = require('scb-node-parser');
-var Message = require('../lib/message');
+var Message = require('scb-node-parser/message');
 
 /*Messages look like this:
 
@@ -105,9 +105,8 @@ function listenDirectMessage(api) {
         console.log(message.body);
         console.log(message.threadID);
         console.log(message);
-        var parsedMessage = scbNodeParser.getMessage(message.body).getMessage();
-        var parsedTo = scbNodeParser.getMessage(message.body).getTo();
-        message = new Message(message.threadID, parsedTo, parsedMessage);
-        sender.post(message);
+        var parsedMessage = scbNodeParser.getMessage(message.body);
+        parsedMessage.setFrom(message.threadID);
+        sender.post(parsedMessage);
     });
 }
