@@ -8,6 +8,7 @@
         "express": "4.14.x",
         "morgan": "1.7.x",
         "body-parser": "1.15.x",
-        "facebook-chat-api": "1.2.x"
+        "facebook-chat-api": "1.2.x",
+        "winston": "2.3.1"
     }
 }

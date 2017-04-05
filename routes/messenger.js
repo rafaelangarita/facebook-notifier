@@ -1,9 +1,20 @@
 const conf = require('../conf/conf');
+const confamqp = require('../conf/amqp-endpoint.conf');
 const login = require('facebook-chat-api');
 const fs = require('fs');
 const sender = require('../amqp-sender');
 const scbNodeParser = require('scb-node-parser');
 var Message = require('scb-node-parser/message');
+
+var winston = require('winston');
+
+var logger = new(winston.Logger)({
+    transports: [
+        new(winston.transports.File)({
+            filename: 'application.log'
+        })
+    ]
+});
 
 /*Messages look like this:
 
@@ -30,7 +41,7 @@ exports.sendMessage = function(req, res) {
             try {
                 fs.writeFileSync('appstate.json', JSON.stringify(api.getAppState()));
             } catch (err) {
-                console.log(err);
+                logger.log('error', 'authentication_error', err);
             }
             send(err, api, req.body.threadID, req.body.message)
         });
@@ -69,7 +80,7 @@ exports.sendDirectMessage = function(threadID, message) {
 
 
 function send(err, api, threadID, message) {
-    if (err) return console.error(err);
+    if (err) return logger.log('error', 'send_error', err);
     savedState = api.getAppState();
     console.log('sending %s to %s', message, threadID);
     api.sendMessage(message, threadID);
@@ -105,8 +116,13 @@ function listenDirectMessage(api) {
         console.log(message.body);
         console.log(message.threadID);
         console.log(message);
+        logger.log('info', 'received_dmmessage', message);
         var parsedMessage = scbNodeParser.getMessage(message.body);
-        parsedMessage.setFrom(message.threadID);
+        parsedMessage._from = {
+            name: '',
+            uniqueName: message.threadID
+        };
+        parsedMessage._persona = confamqp.exchange.name;
         sender.post(parsedMessage);
     });
 }

@@ -24,7 +24,7 @@ var Message = require('scb-node-parser/message');
 
 exports.listen = function() {
 
-    connection = 'amqp://' + conf.user + ':' + conf.password +
+    var connection = 'amqp://' + conf.user + ':' + conf.password +
         '@' + conf.address + ':' + conf.port;
     amqp.connect(connection, function(err, conn) {
         if (err) {
@@ -49,7 +49,7 @@ exports.listen = function() {
 
 function connect(ch) {
 
-    ex = conf.exchange.name;
+    var ex = conf.exchange.name;
     ch.assertExchange(ex, conf.exchange.type, {
         durable: true
     });
